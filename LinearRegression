@@ -1,0 +1,52 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+# Data load
+data = pd.read_csv('Data.csv')
+x = (data.iloc[0:, 0].values)
+y = (data.iloc[0:, 1].values)
+xTrain = np.array(x[:]).reshape((-1, 1))
+yTrain = np.array(y[:]).reshape((-1, 1))
+
+# Linear Regression
+regression = LinearRegression()
+regression.fit(xTrain, yTrain)
+
+# Error values and average error
+yErrorValue = []  # Error values on the graph
+yErrorValue2 = []  # Error values on the graph
+errors = []  # Real error values
+maxError = 0
+minError = 10 ** 6
+averageError = 0
+for i in range(len(xTrain)):
+    error = abs(regression.predict(xTrain)[i] - yTrain[i])
+    yErrorValue.append(regression.predict(xTrain)[i] + error)
+    yErrorValue2.append(regression.predict(xTrain)[i] - error)
+    if (error > maxError):  # Get max error value
+        maxError = error
+    if (error < minError):  # Get min error value
+        minError = error
+    errors.append(error)
+    averageError += error
+averageError /= len(xTrain)  # Get average error value
+
+# Plot settings
+plt.scatter(xTrain, yTrain, marker='+', color='#3F3BFA')
+plt.plot(xTrain, regression.predict(xTrain), marker='.', color='r', linewidth=2)
+plt.plot(xTrain, yErrorValue, marker=',', color='y', linewidth=1)
+plt.plot(xTrain, yErrorValue2, marker=',', color='g', linewidth=1)
+plt.grid(color='#1f1f1f', linestyle='dashed', linewidth=0.3)
+plt.gca().set_facecolor('#ffffff')
+plt.legend(["Regression/Predictions", "Upper error line", "Lower error line", "Real data points"])
+plt.title('Linear regression', fontsize=15, fontname='Montserrat', weight="black", color='#3F3BFA')
+plt.xlabel('X axis', fontsize=15, fontname='Montserrat', weight="black", color='#3F3BFA')
+plt.ylabel('Y axis', fontsize=15, fontname='Montserrat', weight="black", color='#3F3BFA')
+# plt.get_current_fig_manager().full_screen_toggle() #Shows the graph in fullscreen
+plt.show()
+
+print("Max error: " + str(maxError))
+print("Min error: " + str(minError))
+print("Average error: " + str(averageError))
